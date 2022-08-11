@@ -15,4 +15,12 @@ This program uses [pygame](https://pypi.org/project/pygame/) for graphics.
 
 4. Now you can run the `render_mesh.py` script to render the mesh.
 
+## Controls
+
+Hold left click and drag to tilt the mesh.
+
+Hold right click and drag to move the light.
+
+The Escape key and the close button of the window will exit the program
+
 ***Note: `render_mesh.py` needs to be refined, expect bugs and weird behavior.***
