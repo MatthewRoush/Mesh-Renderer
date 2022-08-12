@@ -5,7 +5,7 @@ def main():
     """Parse an .OBJ file for mesh data."""
     settings = get_settings()
     # The key for the mesh data.
-    mesh_name = settings["mesh"]
+    mesh_name = settings["mesh"].title()
 
     vertices = ""
     faces = ""
