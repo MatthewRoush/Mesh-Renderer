@@ -1,4 +1,3 @@
-# Import required libraries.
 import sys
 import math
 import json
@@ -41,7 +40,6 @@ def main():
     mesh = settings["mesh"].title()
     vertices = meshes[mesh]["verts"]
     faces = meshes[mesh]["faces"]
-    edges = meshes[mesh]["edges"]
     normals = meshes[mesh]["normals"]
 
     minX, maxX = vertices[0][0], vertices[0][0]
@@ -67,13 +65,14 @@ def main():
     # X = left, -X = right, Y = up, -Y = down, Z = forward, -Z = back
     light_source = settings["light_coordinates"]
     light_brightness = settings["light_brightness"]
+    light_col = settings["light_color"]
     bounding_rect = pg.Rect(0, 0, 1, 1)
     rendered_text_rect = pg.Rect(0, 0, 1, 1)
     vertices = transpose(vertices)
     normals = transpose(normals)
 
-    rot = 0 #(mouse_pos[0] / screen_width) * math.tau
-    tilt = 0 #(mouse_pos[1] / screen_height) * math.tau
+    rot = 0
+    tilt = 0
 
     lmb_hold = False
     rmb_hold = False
@@ -111,7 +110,7 @@ def main():
 
         mouse_delta = [0, 0]
         mouse_delta = (mouse_pos[0] - prev_mouse_pos[0],
-                            mouse_pos[1] - prev_mouse_pos[1])
+                        mouse_pos[1] - prev_mouse_pos[1])
 
         if lmb_hold:
             tilt += mouse_delta[1]/500
@@ -130,7 +129,7 @@ def main():
         screen.fill(bg_color, rendered_text_rect)
         dirty_rects.append(rendered_text_rect)
 
-        bounding_rect = render_mesh(screen, verts, faces, edges, norms)
+        bounding_rect = render_mesh(screen, verts, faces, norms)
         dirty_rects.append(bounding_rect)
 
         # Draw origin
@@ -154,7 +153,7 @@ def main():
     pg.quit() # Quit pygame.
     sys.exit() # Exit the program.
 
-def render_mesh(screen, verts, faces, edges, norms):
+def render_mesh(screen, verts, faces, norms):
     """Graphs the points in a list using segments."""
     # Used for making an update rect.
     minX, maxX = verts[0][0], verts[0][0]
@@ -182,15 +181,18 @@ def render_mesh(screen, verts, faces, edges, norms):
             # Gonna be honest, I don't really know what I'm doing here.
             theta_diff = angle4[1] - angle3[1]
             phi_diff = angle4[2] - angle3[2]
-            theta_phi = theta_diff + phi_diff
+            theta_phi = abs((theta_diff + phi_diff)/400)
 
             # Sketchy light calculation.
-            r = (settings["mesh_color"][0] * angle3[0] *
-                light_brightness * abs(theta_phi/400))
-            g = (settings["mesh_color"][1] * angle3[0] *
-                light_brightness * abs(theta_phi/400))
-            b = (settings["mesh_color"][2] * angle3[0] *
-                light_brightness * abs(theta_phi/400))
+            r = (settings["background_color"][0] + settings["mesh_color"][0] *
+                angle3[0] * light_brightness * theta_phi *
+                (settings["light_color"][0]/255))
+            g = (settings["background_color"][1] + settings["mesh_color"][1] *
+                angle3[0] * light_brightness * theta_phi *
+                (settings["light_color"][1]/255))
+            b = (settings["background_color"][2] + settings["mesh_color"][2] *
+                angle3[0] * light_brightness * theta_phi *
+                (settings["light_color"][2]/255))
 
             # Make sure RGB values are within the proper range.
             if r < 0:
@@ -238,11 +240,11 @@ def render_mesh(screen, verts, faces, edges, norms):
     return bounding_rect
 
 def mag(v):
-    """return the magnitude of a 3D vector."""
+    """Return the magnitude of a 3D vector."""
     return math.sqrt(v[0]**2 + v[1]**2 + v[2]**2)
 
 def dot(v1, v2):
-    """return the dot product of two 3D vectors."""
+    """Return the dot product of two 3D vectors."""
     return v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2]
 
 def project(v1, v2):
@@ -314,6 +316,6 @@ def matrixMult(a, b, n=False):
 
     return return_matrix
 
-# Run main() when the program is launched.
+# Run main() when the script is ran.
 if __name__ == "__main__":
     main()
